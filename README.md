@@ -180,12 +180,58 @@ contextgraph-lite/
 
 ---
 
+## Deployment (Render + Vercel)
+
+### Backend → Render
+
+1. Push this repo to GitHub.
+2. In Render, **New → Blueprint**, point it at the repo. Render will read
+   `render.yaml` at the root and create a free web service automatically.
+   (No blueprint? New → Web Service, same repo, and set manually:
+   - **Build command:** `pip install -r requirements.txt`
+   - **Start command:** `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT`)
+3. In the service's **Environment** tab, set:
+   - `COGNODB_URI` — your CognoDB Cloud URI
+   - `COGNODB_USER` — `cognodb`
+   - `COGNODB_PASSWORD` — your CognoDB password
+   - `CORS_ORIGINS` — leave a placeholder for now (`http://localhost:5173`); you'll
+     update it once you have the Vercel URL in step 3 below.
+4. Deploy. Confirm `https://<your-service>.onrender.com/health` returns `{"status":"ok"}`.
+   Render's free tier spins down when idle — the first request after a quiet period can
+   take ~30–60s to wake up.
+
+### Frontend → Vercel
+
+1. In Vercel, **New Project**, import the same repo.
+2. Set **Root Directory** to `frontend` (this repo has both backend and frontend at the
+   root, so Vercel needs to know where the actual frontend app lives).
+3. Add an environment variable: `VITE_API_URL` = your Render URL from above
+   (e.g. `https://contextgraph-lite-api.onrender.com`).
+4. Deploy. Vercel picks up `frontend/vercel.json` automatically for the build settings
+   and SPA routing.
+
+### Close the loop
+
+Once you have the real Vercel URL, go back to Render's environment settings and set
+`CORS_ORIGINS` to it (e.g. `https://contextgraph-lite.vercel.app`), then trigger a
+redeploy — otherwise the browser will block requests from the deployed frontend to the
+deployed backend.
+
+---
+
 ## Screenshots
 
-_Add screenshots of the Dashboard, Path Finder, and Project Health views here before
-submitting._
+**Dashboard** — search the org, or pull context for a task:
+![Dashboard](docs/screenshots/dashboard.png)
+
+**Path Finder** — shortest chain of context between two people:
+![Path Finder](docs/screenshots/path-finder.png)
+
+**Project Health** — root blockers and what they're holding up:
+![Project Health](docs/screenshots/project-health.png)
 
 ## Demo
 
-- **Hosted app:** _add your deployed link here_
+- **Hosted app:** https://contextgraph-lite.vercel.app
+- **API:** https://contextgraph-lite.onrender.com
 - **Screen recording:** _add your recording link here_
