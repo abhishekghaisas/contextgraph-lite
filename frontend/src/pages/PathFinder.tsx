@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { api } from '../api'
 import EmptyState from '../components/EmptyState'
+import EntityPicker from '../components/EntityPicker'
 import ErrorBanner from '../components/ErrorBanner'
 import LoadingState from '../components/LoadingState'
 import type { PathResult } from '../types'
@@ -12,18 +13,23 @@ export default function PathFinder() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const findPath = async () => {
-    if (!fromId || !toId) return
+  const findPath = async (from: string, to: string) => {
+    if (!from || !to) return
     setLoading(true)
     setError(null)
     setResult(null)
     try {
-      setResult(await api.shortestPath(fromId, toId))
+      setResult(await api.shortestPath(from, to))
     } catch (e) {
       setError((e as Error).message)
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchPeople = async (q: string) => {
+    const people = await api.people(q)
+    return people.map((p) => ({ id: p.id, label: p.name, sublabel: p.title }))
   }
 
   return (
@@ -36,21 +42,22 @@ export default function PathFinder() {
 
       <section className="card">
         <div className="row">
-          <input
-            className="input"
-            placeholder="Person A id…"
-            value={fromId}
-            onChange={(e) => setFromId(e.target.value)}
+          <EntityPicker
+            placeholder="Search person A by name…"
+            fetchOptions={fetchPeople}
+            onSelect={(opt) => {
+              setFromId(opt.id)
+              if (toId) findPath(opt.id, toId)
+            }}
           />
-          <input
-            className="input"
-            placeholder="Person B id…"
-            value={toId}
-            onChange={(e) => setToId(e.target.value)}
+          <EntityPicker
+            placeholder="Search person B by name…"
+            fetchOptions={fetchPeople}
+            onSelect={(opt) => {
+              setToId(opt.id)
+              if (fromId) findPath(fromId, opt.id)
+            }}
           />
-          <button className="btn" onClick={findPath}>
-            Find path
-          </button>
         </div>
 
         {loading && <LoadingState label="Walking the graph…" />}
@@ -66,7 +73,7 @@ export default function PathFinder() {
           </ol>
         )}
         {!loading && !error && !result && (
-          <EmptyState label="Enter two person ids to see how they're connected." />
+          <EmptyState label="Pick two people to see how they're connected." />
         )}
       </section>
     </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import EmptyState from '../components/EmptyState'
+import EntityPicker from '../components/EntityPicker'
 import ErrorBanner from '../components/ErrorBanner'
 import LoadingState from '../components/LoadingState'
 import type { ContextResult, Person } from '../types'
@@ -11,7 +12,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const [taskId, setTaskId] = useState('')
+  const [selectedTask, setSelectedTask] = useState<{ id: string; label: string } | null>(null)
   const [context, setContext] = useState<ContextResult[] | null>(null)
   const [contextLoading, setContextLoading] = useState(false)
   const [contextError, setContextError] = useState<string | null>(null)
@@ -26,8 +27,7 @@ export default function Dashboard() {
       .finally(() => setLoading(false))
   }, [query])
 
-  const loadContext = async () => {
-    if (!taskId) return
+  const loadContext = async (taskId: string) => {
     setContextLoading(true)
     setContextError(null)
     try {
@@ -72,20 +72,20 @@ export default function Dashboard() {
 
       <section className="card">
         <h2>Who has context on a task?</h2>
-        <div className="row">
-          <input
-            className="input"
-            placeholder="Paste a task id (e.g. task_a1b2c3d4)…"
-            value={taskId}
-            onChange={(e) => setTaskId(e.target.value)}
-          />
-          <button className="btn" onClick={loadContext}>
-            Find context
-          </button>
-        </div>
+        <EntityPicker
+          placeholder="Search for a task by name…"
+          fetchOptions={async (q) => {
+            const tasks = await api.tasks(q)
+            return tasks.map((t) => ({ id: t.id, label: t.title, sublabel: t.project }))
+          }}
+          onSelect={(opt) => {
+            setSelectedTask(opt)
+            loadContext(opt.id)
+          }}
+        />
         {contextLoading && <LoadingState label="Traversing the graph…" />}
         {contextError && <ErrorBanner message={contextError} />}
-        {!contextLoading && !contextError && context && context.length === 0 && (
+        {!contextLoading && !contextError && selectedTask && context && context.length === 0 && (
           <EmptyState label="No one found within 3 hops of this task." />
         )}
         {!contextLoading && !contextError && context && context.length > 0 && (

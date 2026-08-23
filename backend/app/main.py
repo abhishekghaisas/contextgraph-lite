@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .db import db
 from .models import HealthResponse
-from .routers import blockers, context, experts, graph, path, people
+from .routers import blockers, context, experts, graph, path, people, projects, tasks
 
 app = FastAPI(
     title="ContextGraph Lite API",
@@ -20,6 +20,8 @@ app.add_middleware(
 )
 
 app.include_router(people.router)
+app.include_router(tasks.router)
+app.include_router(projects.router)
 app.include_router(context.router)
 app.include_router(path.router)
 app.include_router(blockers.router)

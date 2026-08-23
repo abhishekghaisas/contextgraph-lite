@@ -10,6 +10,18 @@ class PersonOut(BaseModel):
     team: Optional[str] = None
 
 
+class TaskOut(BaseModel):
+    id: str
+    title: str
+    project: Optional[str] = None
+
+
+class ProjectOut(BaseModel):
+    id: str
+    name: str
+    status: Optional[str] = None
+
+
 class ContextResult(BaseModel):
     person: str
     title: Optional[str] = None

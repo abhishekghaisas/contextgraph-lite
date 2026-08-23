@@ -4,9 +4,11 @@ import type {
   ExpertResult,
   PathResult,
   Person,
+  Project,
+  Task,
 } from './types'
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001'
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 async function request<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`)
@@ -22,6 +24,12 @@ export const api = {
 
   people: (q?: string) =>
     request<Person[]>(`/people${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+
+  tasks: (q?: string) =>
+    request<Task[]>(`/tasks${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+
+  projects: (q?: string) =>
+    request<Project[]>(`/projects${q ? `?q=${encodeURIComponent(q)}` : ''}`),
 
   contextForTask: (taskId: string, hops = 3) =>
     request<ContextResult[]>(`/context/task/${encodeURIComponent(taskId)}?hops=${hops}`),

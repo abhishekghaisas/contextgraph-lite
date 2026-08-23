@@ -5,6 +5,18 @@ export interface Person {
   team?: string
 }
 
+export interface Task {
+  id: string
+  title: string
+  project?: string
+}
+
+export interface Project {
+  id: string
+  name: string
+  status?: string
+}
+
 export interface ContextResult {
   person: string
   title?: string

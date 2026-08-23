@@ -105,8 +105,47 @@ body {
   gap: 10px;
   margin-bottom: 12px;
 }
-.row .input {
+.row .input,
+.row .picker {
   flex: 1;
+}
+
+.picker {
+  position: relative;
+}
+
+.picker-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.picker-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.picker-item:hover {
+  background: var(--color-surface-alt);
+}
+.picker-item.dim {
+  color: var(--color-text-dim);
+  cursor: default;
+}
+.picker-item span {
+  color: var(--color-text-dim);
+  white-space: nowrap;
 }
 
 .btn {

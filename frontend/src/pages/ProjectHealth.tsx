@@ -1,18 +1,17 @@
 import { useState } from 'react'
 import { api } from '../api'
 import EmptyState from '../components/EmptyState'
+import EntityPicker from '../components/EntityPicker'
 import ErrorBanner from '../components/ErrorBanner'
 import LoadingState from '../components/LoadingState'
 import type { BlockerChain } from '../types'
 
 export default function ProjectHealth() {
-  const [projectId, setProjectId] = useState('')
   const [chains, setChains] = useState<BlockerChain[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const loadBlockers = async () => {
-    if (!projectId) return
+  const loadBlockers = async (projectId: string) => {
     setLoading(true)
     setError(null)
     try {
@@ -30,17 +29,14 @@ export default function ProjectHealth() {
       <p className="subtitle">See which root tasks are blocking the most downstream work.</p>
 
       <section className="card">
-        <div className="row">
-          <input
-            className="input"
-            placeholder="Project id…"
-            value={projectId}
-            onChange={(e) => setProjectId(e.target.value)}
-          />
-          <button className="btn" onClick={loadBlockers}>
-            Check blockers
-          </button>
-        </div>
+        <EntityPicker
+          placeholder="Search for a project by name…"
+          fetchOptions={async (q) => {
+            const projects = await api.projects(q)
+            return projects.map((p) => ({ id: p.id, label: p.name, sublabel: p.status }))
+          }}
+          onSelect={(opt) => loadBlockers(opt.id)}
+        />
 
         {loading && <LoadingState label="Tracing blocker chains…" />}
         {error && <ErrorBanner message={error} />}
