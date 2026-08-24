@@ -234,4 +234,4 @@ deployed backend.
 
 - **Hosted app:** https://contextgraph-lite.vercel.app
 - **API:** https://contextgraph-lite.onrender.com
-- **Screen recording:** _add your recording link here_
+- **Screen recording:** https://drive.google.com/file/d/1qDhx3KdfZA0m01ldr90ETn1CvWuQGNjk/view?usp=drive_link
